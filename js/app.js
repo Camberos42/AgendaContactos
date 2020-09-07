@@ -1,5 +1,6 @@
 const formulariocontactos = document.querySelector('#contacto'),
-    listadoContactos = document.querySelector('#listado-contactos tbody');
+    listadoContactos = document.querySelector('#listado-contactos tbody'),
+    inputbuscador = document.querySelector('#buscar');
 
 eventListeners();
 
@@ -10,6 +11,12 @@ function eventListeners() {
     if (listadoContactos) {
         listadoContactos.addEventListener('click', eliminarContacto);
     }
+    //buscador
+    inputbuscador.addEventListener('input', buscarContactos);
+
+    //Funcion que mostrara cuantos contactos hay 
+    numeroContactos()
+
 }
 
 //Se agrega una e como parametro para eliminar la accion por default
@@ -118,6 +125,9 @@ function insertarBD(infoContacto) {
             // Mostrar la notificacion
             mostrarNotificacion('Contacto Creado Correctamente', 'correcto');
 
+            //Actualizar/Mostrar el numero de contactos
+            numeroContactos();
+
         }
     }
 
@@ -190,6 +200,10 @@ function eliminarContacto(e) {
 
                             // mostrar Notificación
                             mostrarNotificacion('Contacto eliminado', 'correcto');
+
+                            //Actualizar/Mostrar el numero de contactos
+                            numeroContactos();
+
                         }
                     }
                 }
@@ -220,4 +234,46 @@ function mostrarNotificacion(mensaje, clase) {
             }, 500)
         }, 3000);
     }, 100)
+}
+
+//Buscador de registros
+function buscarContactos(e) {
+    //console.log(e.target.value);
+
+    //Tomar los registros de cada elemento del dom (cada contacto)
+    const expresion = new RegExp(e.target.value, "i");
+    registros = document.querySelectorAll('tbody tr');
+
+    //Ocultar los elementos cuando se tecle algo en el buscador
+    registros.forEach(registro => {
+        registro.style.display = 'none';
+
+        //Para filtrar el numero del nodo y traerme el nombre (1) , empresa o lo que quiera
+        //console.log(registro.childNodes[1].textContent.replace(/\s/g, " ").search(expresion) != -1);
+
+        //Compara que cada registro cuando estas tecleando en el buscador sea true y lo muestre en el Dom
+        if (registro.childNodes[1].textContent.replace(/\s/g, " ").search(expresion) != -1) {
+            registro.style.display = 'table-row';
+        }
+        //Metodo para mostrar el total de contactos
+        numeroContactos();
+    })
+
+}
+
+/** Muestra el número de Contactos */
+function numeroContactos() {
+    const totalContactos = document.querySelectorAll('tbody tr'),
+        contenedorNumero = document.querySelector('.total-contactos span');
+
+    let total = 0;
+
+    totalContactos.forEach(contacto => {
+        if (contacto.style.display === '' || contacto.style.display === 'table-row') {
+            total++;
+        }
+    });
+
+    // console.log(total);
+    contenedorNumero.textContent = total;
 }
